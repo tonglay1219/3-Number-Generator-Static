@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pick 3 Numbers</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.top-row {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+button,
+select {
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: white;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:hover {
+    background: #f0f0f0;
+}
+
+.tracker-container {
+    display: flex;
+    gap: 10px;
+}
+
+.tracker {
+    flex: 1;
+    min-width: 70px;
+    height: 50px;
+    border: 2px solid #333;
+    border-radius: 8px;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.message {
+    text-align: center;
+    padding: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #2e7d32;
+}
+
+.grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 6px;
+    padding: 6px;
+}
+
+.cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    border: 2px solid #333;
+    border-radius: 8px;
+    font-size: clamp(36px, 8vw, 80px);
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    transition: all .15s ease;
+}
+
+.cell:hover {
+    background: #e8f4ff;
+    transform: scale(0.98);
+}
+
+.cell.disabled {
+    background: #ddd;
+    color: #777;
+    cursor: not-allowed;
+}
+
+@media (orientation: landscape) {
+    .tracker {
+        height: 50px;
+        font-size: 22px;
+    }
+
+    .cell {
+        font-size: clamp(30px, 6vw, 70px);
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+
+    <div class="top-row">
+
+        <button onclick="resetGame()">🧹</button>
+
+        <button onclick="generateGrid()" id="refreshBtn">
+            🔄
+        </button>
+
+        <select id="rangeSelect" onchange="resetGame()">
+            <option value="99" selected>1–99</option>
+            <option value="9">1–9</option>
+        </select>
+
+        <div class="tracker" id="tracker1"></div>
+        <div class="tracker" id="tracker2"></div>
+        <div class="tracker" id="tracker3"></div>
+
+    </div>
+
+    <div class="message" id="message"></div>
+
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const trackers = [
+    document.getElementById("tracker1"),
+    document.getElementById("tracker2"),
+    document.getElementById("tracker3")
+];
+
+const grid = document.getElementById("grid");
+const message = document.getElementById("message");
+
+function getMaxRange() {
+    return Number(document.getElementById("rangeSelect").value);
+}
+
+function generateUniqueNumbers(count, min, max) {
+    const numbers = [];
+
+    while (numbers.length < count) {
+        const num = Math.floor(Math.random() * (max - min + 1)) + min;
+
+        if (!numbers.includes(num)) {
+            numbers.push(num);
+        }
+    }
+
+    return numbers;
+}
+
+function trackersFull() {
+    return trackers.every(t => t.textContent !== "");
+}
+
+function selectedCount() {
+    return trackers.filter(t => t.textContent !== "").length;
+}
+
+function updateMessage() {
+    const count = selectedCount();
+
+    if (count === 0) {
+        message.textContent = "Pick 3 numbers";
+    } else if (count < 3) {
+        message.textContent =
+            `Pick ${3 - count} more number${3 - count > 1 ? "s" : ""}`;
+    } else {
+        message.textContent = "All 3 numbers selected";
+    }
+}
+
+function generateGrid() {
+
+    const maxRange = getMaxRange();
+
+    const numbers = generateUniqueNumbers(
+        9,
+        1,
+        maxRange
+    );
+
+    grid.innerHTML = "";
+
+    numbers.forEach(number => {
+
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.textContent = number;
+
+        if (trackersFull()) {
+            cell.classList.add("disabled");
+        } else {
+            cell.addEventListener("click", () => {
+                selectNumber(number);
+            });
+        }
+
+        grid.appendChild(cell);
+    });
+
+    document.getElementById("refreshBtn").disabled = trackersFull();
+
+    updateMessage();
+}
+
+function selectNumber(number) {
+
+    if (trackersFull()) return;
+
+    for (const tracker of trackers) {
+
+        if (tracker.textContent === "") {
+
+            tracker.textContent = number;
+
+            // Refresh grid immediately after every pick
+            generateGrid();
+
+            return;
+        }
+    }
+}
+
+function resetGame() {
+
+    trackers.forEach(tracker => {
+        tracker.textContent = "";
+    });
+
+    generateGrid();
+}
+
+generateGrid();
+</script>
+
+</body>
+</html>
