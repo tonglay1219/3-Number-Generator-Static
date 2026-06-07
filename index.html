@@ -12,116 +12,221 @@
     padding: 0;
 }
 
-html, body {
+:root {
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --muted: #64748b;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --success: #16a34a;
+
+    --shadow:
+        0 4px 12px rgba(15, 23, 42, 0.06),
+        0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+html,
+body {
     height: 100%;
-    font-family: Arial, sans-serif;
-    background: #f5f5f5;
 }
 
 body {
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    background: var(--bg);
+    color: var(--text);
+
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+}
+
+/* ---------- TOP BAR ---------- */
+
+.top-bar {
+    flex-shrink: 0;
+
+    background: var(--card);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    border-bottom: 1px solid var(--border);
 }
 
 .top-row {
-    display: flex;
-    gap: 3px;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
 }
 
-.controls {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+.tracker-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 12px;
 }
 
 button,
 select {
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background: white;
+    width: 100%;
+    height: 52px;
+
+    border: none;
+    border-radius: 14px;
+
+    font-size: 15px;
+    font-weight: 600;
 }
 
 button {
     cursor: pointer;
+    color: white;
+
+    background: linear-gradient(
+        135deg,
+        var(--primary),
+        #3b82f6
+    );
+
+    transition:
+        transform .15s ease,
+        opacity .15s ease;
 }
 
 button:hover {
-    background: #f0f0f0;
+    transform: translateY(-1px);
 }
 
-.tracker-container {
-    display: flex;
-    gap: 10px;
+button:active {
+    transform: scale(0.97);
+}
+
+button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+select {
+    padding: 0 12px;
+    background: white;
+    border: 1px solid var(--border);
+    color: var(--text);
 }
 
 .tracker {
-    flex: 1;
-    min-width: 70px;
-    height: 50px;
-    border: 2px solid #333;
-    border-radius: 8px;
+    height: 52px;
+
+    border-radius: 14px;
+    border: 1px solid var(--border);
+
     background: white;
+    box-shadow: var(--shadow);
+
     display: flex;
     justify-content: center;
     align-items: center;
+
     font-size: 24px;
-    font-weight: bold;
+    font-weight: 700;
+    color: var(--primary);
 }
 
 .message {
+    margin-top: 12px;
+
     text-align: center;
-    padding: 8px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #2e7d32;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--muted);
 }
+
+/* ---------- GRID ---------- */
 
 .grid {
     flex: 1;
     min-height: 0;
+
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    gap: 6px;
-    padding: 6px;
+
+    gap: 12px;
+    padding: 12px;
 }
 
 .cell {
+    background: white;
+    border-radius: 22px;
+
     display: flex;
     justify-content: center;
     align-items: center;
-    background: white;
-    border: 2px solid #333;
-    border-radius: 8px;
-    font-size: clamp(36px, 8vw, 80px);
-    font-weight: bold;
+
+    font-size: clamp(42px, 8vw, 90px);
+    font-weight: 800;
+
+    box-shadow: var(--shadow);
+
     cursor: pointer;
     user-select: none;
-    transition: all .15s ease;
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease;
 }
 
 .cell:hover {
-    background: #e8f4ff;
-    transform: scale(0.98);
+    transform: translateY(-3px);
+}
+
+.cell:active {
+    transform: scale(0.97);
 }
 
 .cell.disabled {
-    background: #ddd;
-    color: #777;
+    opacity: 0.45;
     cursor: not-allowed;
 }
 
-@media (orientation: landscape) {
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 600px) {
+
+    .top-bar {
+        padding: 12px;
+    }
+
+    .top-row,
+    .tracker-row {
+        gap: 8px;
+    }
+
+    button,
+    select,
     .tracker {
-        height: 50px;
-        font-size: 22px;
+        height: 48px;
+    }
+
+    .tracker {
+        font-size: 20px;
+    }
+
+    .grid {
+        gap: 8px;
+        padding: 8px;
     }
 
     .cell {
-        font-size: clamp(30px, 6vw, 70px);
+        border-radius: 18px;
+        font-size: clamp(36px, 10vw, 72px);
     }
 }
 </style>
@@ -131,7 +236,6 @@ button:hover {
 <div class="top-bar">
 
     <div class="top-row">
-
         <button onclick="resetGame()">🧹</button>
 
         <button onclick="generateGrid()" id="refreshBtn">
@@ -139,14 +243,15 @@ button:hover {
         </button>
 
         <select id="rangeSelect" onchange="resetGame()">
-            <option value="99" selected>1–99</option>
-            <option value="9">1–9</option>
+            <option value="9" selected>1–9</option>
+            <option value="99">1–99</option>
         </select>
+    </div>
 
+    <div class="tracker-row">
         <div class="tracker" id="tracker1"></div>
         <div class="tracker" id="tracker2"></div>
         <div class="tracker" id="tracker3"></div>
-
     </div>
 
     <div class="message" id="message"></div>
@@ -164,16 +269,24 @@ const trackers = [
 
 const grid = document.getElementById("grid");
 const message = document.getElementById("message");
+const refreshBtn = document.getElementById("refreshBtn");
 
 function getMaxRange() {
-    return Number(document.getElementById("rangeSelect").value);
+    return Number(
+        document.getElementById("rangeSelect").value
+    );
 }
 
 function generateUniqueNumbers(count, min, max) {
+
     const numbers = [];
 
     while (numbers.length < count) {
-        const num = Math.floor(Math.random() * (max - min + 1)) + min;
+
+        const num =
+            Math.floor(
+                Math.random() * (max - min + 1)
+            ) + min;
 
         if (!numbers.includes(num)) {
             numbers.push(num);
@@ -184,23 +297,31 @@ function generateUniqueNumbers(count, min, max) {
 }
 
 function trackersFull() {
-    return trackers.every(t => t.textContent !== "");
+    return trackers.every(
+        tracker => tracker.textContent !== ""
+    );
 }
 
 function selectedCount() {
-    return trackers.filter(t => t.textContent !== "").length;
+    return trackers.filter(
+        tracker => tracker.textContent !== ""
+    ).length;
 }
 
 function updateMessage() {
+
     const count = selectedCount();
 
     if (count === 0) {
         message.textContent = "Pick 3 numbers";
-    } else if (count < 3) {
+    }
+    else if (count < 3) {
         message.textContent =
             `Pick ${3 - count} more number${3 - count > 1 ? "s" : ""}`;
-    } else {
-        message.textContent = "All 3 numbers selected";
+    }
+    else {
+        message.textContent =
+            "All 3 numbers selected";
     }
 }
 
@@ -208,32 +329,37 @@ function generateGrid() {
 
     const maxRange = getMaxRange();
 
-    const numbers = generateUniqueNumbers(
-        9,
-        1,
-        maxRange
-    );
+    const numbers =
+        generateUniqueNumbers(
+            9,
+            1,
+            maxRange
+        );
 
     grid.innerHTML = "";
 
     numbers.forEach(number => {
 
-        const cell = document.createElement("div");
+        const cell =
+            document.createElement("div");
+
         cell.className = "cell";
         cell.textContent = number;
 
         if (trackersFull()) {
             cell.classList.add("disabled");
-        } else {
-            cell.addEventListener("click", () => {
-                selectNumber(number);
-            });
+        }
+        else {
+            cell.addEventListener(
+                "click",
+                () => selectNumber(number)
+            );
         }
 
         grid.appendChild(cell);
     });
 
-    document.getElementById("refreshBtn").disabled = trackersFull();
+    refreshBtn.disabled = trackersFull();
 
     updateMessage();
 }
@@ -248,12 +374,19 @@ function selectNumber(number) {
 
             tracker.textContent = number;
 
-            // Refresh grid immediately after every pick
+            // Auto refresh after selection
             generateGrid();
 
             return;
         }
     }
+}
+
+function manualRefresh() {
+
+    if (trackersFull()) return;
+
+    generateGrid();
 }
 
 function resetGame() {
